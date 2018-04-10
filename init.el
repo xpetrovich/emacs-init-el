@@ -89,6 +89,10 @@
 (require 'yasnippet)
 (yas-global-mode 1)
 
+(require 'org-install)
+(add-to-list 'auto-mode-alist '("\\.org\\'". org-mode))
+(global-font-lock-mode 1)
+
 ;; My remaps
 
 ;; (add-hook 'emmet-mode-hook

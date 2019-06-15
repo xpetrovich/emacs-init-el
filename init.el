@@ -53,6 +53,9 @@
 (electric-pair-mode 1)
 (electric-indent-mode -1)
 
+(tool-bar-mode -1)
+(scroll-bar-mode -1)
+
 
 ;disable backup
 (setq make-backup-files nil)
@@ -120,25 +123,3 @@
 ;; (defun my-mode-hook ()
 ;;    (local-set-key (kbd "C-j") 'backward-char))
 ;; (add-hook 'lisp-interaction-mode-hook 'my-mode-hook)
-
-
-(custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(ansi-color-faces-vector
-   [default default default italic underline success warning error])
- '(ansi-color-names-vector
-   ["black" "#d55e00" "#009e73" "#f8ec59" "#0072b2" "#cc79a7" "#56b4e9" "white"])
- '(column-number-mode t)
- '(custom-enabled-themes (quote (adwaita)))
- '(custom-safe-themes
-   (quote
-    ("6ee6f99dc6219b65f67e04149c79ea316ca4bcd769a9e904030d38908fd7ccf9" default))))
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(default ((t (:family "Consolas" :foundry "outline" :slant normal :weight normal :height 143 :width normal)))))

@@ -6,7 +6,7 @@
   (add-to-list 'package-archives '("gnu" . "http://elpa.gnu.org/packages/"))
 (package-initialize) ;; You might already have this line
 
-(setq required-pkgs '(auto-complete yasnippet multiple-cursors web-mode phi-search phi-search-mc expand-region))
+(setq required-pkgs '(auto-complete yasnippet multiple-cursors web-mode phi-search phi-search-mc expand-region sr-speedbar pdf-tools))
   (require 'cl)  
   (setq pkgs-to-install       (let ((uninstalled-pkgs (remove-if 'package-installed-p required-pkgs)))
  (remove-if-not '(lambda (pkg) (y-or-n-p (format "Package %s is missing. Install it? " pkg))) uninstalled-pkgs)))  (when (> (length pkgs-to-install) 0)   (package-refresh-contents)   (dolist (pkg pkgs-to-install)     (package-install pkg))) 
@@ -37,6 +37,11 @@
 (column-number-mode t) ;; показать номер столбца в mode-line
 (setq linum-format " %d") ;; задаем формат нумерации строк
 
+(pdf-tools-install)
+(add-hook 'pdf-view-mode-hook (lambda() (linum-mode -1)))
+
+(setq org-startup-truncated nil)
+(global-visual-line-mode t)
 
 (global-set-key (kbd "C-s") 'phi-search)
 (global-set-key (kbd "C-r") 'phi-search-backward)
@@ -51,6 +56,7 @@
 (setq query-replace-highlight t)
 
 (electric-pair-mode 1)
+(show-paren-mode 2)
 (electric-indent-mode -1)
 
 (tool-bar-mode -1)
@@ -82,10 +88,17 @@
 (setq ido-vitrual-buffers      t)
 (setq ido-enable-flex-matching t)
 
-
+(require 'bs)
+(setq bs-configurations
+      '(("files" "^\\*scratch\\*" nil nil bs-visits-non-file bs-sort-buffer-interns-are-last)))
 ;; Autocomplete
 (require 'auto-complete)
 (global-auto-complete-mode            1)
+
+;; Sr Speedbar
+(require 'sr-speedbar)
+(global-unset-key (kbd "<f12>"))
+(global-set-key (kbd "<f12>") 'sr-speedbar-toggle)
 
 
 ;; YASnippets
@@ -107,15 +120,18 @@
 ;;             (define-key emmet-mode-keymap (kbd "M-j")        'emmet-expand-line)))
 
 
-(global-unset-key (kbd "M-i")) ; indent-for-tab-command; this is tab key
-(global-unset-key (kbd "M-j")) ; newline-and-indent
-(global-unset-key (kbd "M-k")) ; kill-line
-(global-unset-key (kbd "M-l")) ; recenter
+(global-unset-key (kbd "M-i")) ;; indent-for-tab-command; this is tab key
+(global-unset-key (kbd "M-j")) ;; newline-and-indent
+(global-unset-key (kbd "M-k")) ;; kill-line
+(global-unset-key (kbd "M-l")) ;; recenter
 
-(global-set-key (kbd "M-j") 'backward-char)
-(global-set-key (kbd "M-l") 'forward-char)
-(global-set-key (kbd "M-i") 'previous-line)
-(global-set-key (kbd "M-k") 'next-line)
+(global-set-key (kbd "M-j") 'windmove-left)
+(global-set-key (kbd "M-l") 'windmove-right)
+(global-set-key (kbd "M-i") 'windmove-up)
+(global-set-key (kbd "M-k") 'windmove-down)
+
+(global-unset-key (kbd "<f2>"))
+(global-set-key (kbd "<f2>") 'bs-show)
 
 
 
@@ -123,3 +139,40 @@
 ;; (defun my-mode-hook ()
 ;;    (local-set-key (kbd "C-j") 'backward-char))
 ;; (add-hook 'lisp-interaction-mode-hook 'my-mode-hook)
+
+(defun reverse-input-method (input-method)
+  "Build the reverse mapping of single letters from INPUT-METHOD."
+  (interactive
+   (list (read-input-method-name "Use input method (default current): ")))
+  (if (and input-method (symbolp input-method))
+      (setq input-method (symbol-name input-method)))
+  (let ((current current-input-method)
+        (modifiers '(nil (control) (meta) (control meta))))
+    (when input-method
+      (activate-input-method input-method))
+    (when (and current-input-method quail-keyboard-layout)
+      (dolist (map (cdr (quail-map)))
+        (let* ((to (car map))
+               (from (quail-get-translation
+                      (cadr map) (char-to-string to) 1)))
+          (when (and (characterp from) (characterp to))
+            (dolist (mod modifiers)
+              (define-key local-function-key-map
+                (vector (append mod (list from)))
+                (vector (append mod (list to)))))))))
+    (when input-method
+      (activate-input-method current))))
+
+(defadvice read-passwd (around my-read-passwd act)
+  (let ((local-function-key-map nil))
+    ad-do-it))
+
+(setq org-export-with-smart-quotes t)
+
+(reverse-input-method 'russian-typewriter)
+
+(custom-set-variables
+ '(custom-enabled-themes (quote (tango-dark))))
+
+(custom-set-faces
+ '(default ((t (:family "Droid Sans Mono Slashed" :foundry "unknown" :slant normal :weight normal :height 107 :width normal)))))

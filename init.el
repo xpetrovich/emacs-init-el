@@ -6,10 +6,16 @@
   (add-to-list 'package-archives '("gnu" . "http://elpa.gnu.org/packages/"))
 (package-initialize) ;; You might already have this line
 
-(setq required-pkgs '(auto-complete yasnippet multiple-cursors web-mode phi-search phi-search-mc expand-region sr-speedbar pdf-tools))
+(setq required-pkgs '(auto-complete yasnippet multiple-cursors web-mode phi-search phi-search-mc expand-region sr-speedbar typo sudo-edit helm-bibtex))
   (require 'cl)  
   (setq pkgs-to-install       (let ((uninstalled-pkgs (remove-if 'package-installed-p required-pkgs)))
  (remove-if-not '(lambda (pkg) (y-or-n-p (format "Package %s is missing. Install it? " pkg))) uninstalled-pkgs)))  (when (> (length pkgs-to-install) 0)   (package-refresh-contents)   (dolist (pkg pkgs-to-install)     (package-install pkg))) 
+
+(require 'typo)
+(setq-default typo-language 'Russian)
+
+(typo-global-mode 1)
+(add-hook 'org-mode-hook 'typo-mode)
 
 (require 'multiple-cursors)
 (global-set-key (kbd "C-S-c C-S-c") 'mc/edit-lines)
@@ -30,6 +36,9 @@
 (add-to-list 'auto-mode-alist '("\\.css\\'" . web-mode))
 
 
+(setq bibtex-completion-bibliography
+      '("~/Yandex.Disk/ОБРАЗОВАНИЕ/lib.bib"))
+
 (require 'linum)
 
 (line-number-mode   t) ;; показать номер строки в mode-line
@@ -37,8 +46,6 @@
 (column-number-mode t) ;; показать номер столбца в mode-line
 (setq linum-format " %d") ;; задаем формат нумерации строк
 
-(pdf-tools-install)
-(add-hook 'pdf-view-mode-hook (lambda() (linum-mode -1)))
 
 (setq org-startup-truncated nil)
 (global-visual-line-mode t)
@@ -109,6 +116,15 @@
 (add-to-list 'auto-mode-alist '("\\.org\\'". org-mode))
 (global-font-lock-mode 1)
 
+(require 'org-ref)
+(setq reftex-default-bibliography '("~/Yandex.Disk/ОБРАЗОВАНИЕ/lib.bib"))
+
+(setq org-latex-pdf-process
+      '("pdflatex -interaction nonstopmode -output-directory %o %f"
+        "biber %b"
+        "pdflatex -interaction nonstopmode -output-directory %o %f"
+        "pdflatex -interaction nonstopmode -output-directory %o %f"))
+
 ;; My remaps
 
 ;; (add-hook 'emmet-mode-hook
@@ -133,7 +149,8 @@
 (global-unset-key (kbd "<f2>"))
 (global-set-key (kbd "<f2>") 'bs-show)
 
-
+(global-unset-key (kbd "<f11>"))
+(global-set-key (kbd "<f11>") (lambda() (interactive)(find-file "~/.emacs.d/init.el")))
 
 
 ;; (defun my-mode-hook ()
@@ -175,4 +192,4 @@
  '(custom-enabled-themes (quote (tango-dark))))
 
 (custom-set-faces
- '(default ((t (:family "Droid Sans Mono Slashed" :foundry "unknown" :slant normal :weight normal :height 107 :width normal)))))
+ '(default ((t (:family "Consolas" :foundry "unknown" :slant normal :weight normal :height 130 :width normal)))))

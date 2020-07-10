@@ -13,7 +13,6 @@
 
 (require 'typo)
 (setq-default typo-language 'Russian)
-
 (typo-global-mode 1)
 (add-hook 'org-mode-hook 'typo-mode)
 
@@ -116,6 +115,13 @@
 (add-to-list 'auto-mode-alist '("\\.org\\'". org-mode))
 (global-font-lock-mode 1)
 
+(setq org-agenda-files (list "~/YandexDisk/agenda.org"
+                             ))
+(define-key global-map "\C-cl" 'org-store-link)
+(define-key global-map "\C-ca" 'org-agenda)
+(setq org-log-done t)
+
+
 (require 'org-ref)
 (setq reftex-default-bibliography '("~/Yandex.Disk/ОБРАЗОВАНИЕ/lib.bib"))
 
@@ -124,17 +130,6 @@
         "biber %b"
         "pdflatex -interaction nonstopmode -output-directory %o %f"
         "pdflatex -interaction nonstopmode -output-directory %o %f"))
-
-;; My remaps
-
-;; (add-hook 'emmet-mode-hook
-;;           (lambda ()
-;;             ;; clearing old C-j and C-return key mapping.
-;;             (define-key emmet-mode-keymap (kbd "C-j")        nil)
-;;             (define-key emmet-mode-keymap (kbd "<C-return>") nil)
-;;             ;; define new M-j key mapping instead.
-;;             (define-key emmet-mode-keymap (kbd "M-j")        'emmet-expand-line)))
-
 
 (global-unset-key (kbd "M-i")) ;; indent-for-tab-command; this is tab key
 (global-unset-key (kbd "M-j")) ;; newline-and-indent
@@ -189,7 +184,10 @@
 (reverse-input-method 'russian-typewriter)
 
 (custom-set-variables
- '(custom-enabled-themes (quote (tango-dark))))
+ '(custom-enabled-themes (quote (tango-dark)))
+ '(package-selected-packages
+   (quote
+    (sudo-edit yasnippet web-mode typo sr-speedbar phi-search-mc org-ref expand-region auto-complete))))
 
 (custom-set-faces
  '(default ((t (:family "Consolas" :foundry "unknown" :slant normal :weight normal :height 130 :width normal)))))

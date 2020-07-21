@@ -6,13 +6,14 @@
   (add-to-list 'package-archives '("gnu" . "http://elpa.gnu.org/packages/"))
 (package-initialize) ;; You might already have this line
 
-(setq required-pkgs '(auto-complete yasnippet multiple-cursors web-mode phi-search phi-search-mc expand-region sr-speedbar typo sudo-edit helm-bibtex))
+(setq required-pkgs '(auto-complete yasnippet multiple-cursors web-mode phi-search phi-search-mc expand-region sr-speedbar typo sudo-edit helm-bibtex pdf-tools))
   (require 'cl)  
   (setq pkgs-to-install       (let ((uninstalled-pkgs (remove-if 'package-installed-p required-pkgs)))
  (remove-if-not '(lambda (pkg) (y-or-n-p (format "Package %s is missing. Install it? " pkg))) uninstalled-pkgs)))  (when (> (length pkgs-to-install) 0)   (package-refresh-contents)   (dolist (pkg pkgs-to-install)     (package-install pkg))) 
 
 (require 'typo)
 (setq-default typo-language 'Russian)
+
 (typo-global-mode 1)
 (add-hook 'org-mode-hook 'typo-mode)
 
@@ -36,14 +37,43 @@
 
 
 (setq bibtex-completion-bibliography
-      '("~/Yandex.Disk/ОБРАЗОВАНИЕ/lib.bib"))
+      '("~/Yandex.Disk/ОБРАЗОВАНИЕ/lib.bib"
+	"~/Yandex.Disk/ОБРАЗОВАНИЕ/facism.bib"))
 
+(setq bibtex-completion-pdf-field "file")
+
+(setq bibtex-completion-notes-path "~/Yandex.Disk/ОБРАЗОВАНИЕ/NOTES/")
+
+(setq bibtex-completion-pdf-symbol "⌘")
+(setq bibtex-completion-notes-symbol "✎")
+
+(setq bibtex-completion-additional-search-fields '(volume))
+
+(setq bibtex-completion-display-formats '((t . "${author:36} ${title:*} ${volume:2} ${year:4} ${=has-pdf=:1}${=has-note=:2} ${=type=:7}")))
+
+(setq org-agenda-custom-commands
+  '(("n" . "Search in notes")
+    ("nt" "Note tags search" tags ""
+     ((org-agenda-files (file-expand-wildcards "~/Yandex.Disk/ОБРАЗОВАНИЕ/NOTES/*.org")))) 
+    ("ns" "Note full text search" search ""
+     ((org-agenda-files (file-expand-wildcards "~/Yandex.Disk/ОБРАЗОВАНИЕ/NOTES/*.org"))))))
+
+(global-set-key (kbd "<f6>") 'helm-bibtex)
+(global-set-key (kbd "<f7>") '(lambda (&optional arg) (interactive "P")(org-agenda arg "ns")))
+(global-set-key (kbd "<f8>") '(lambda (&optional arg) (interactive "P")(org-agenda arg "nt")))
+(global-unset-key (kbd "<f2>"))
+(global-set-key (kbd "<f2>") 'bs-show)
+(global-unset-key (kbd "<f11>"))
+(global-set-key (kbd "<f11>") (lambda() (interactive)(find-file "~/.emacs.d/init.el")))
+
+(pdf-tools-install)
 (require 'linum)
 
 (line-number-mode   t) ;; показать номер строки в mode-line
 (global-linum-mode  t) ;; показывать номера строк во всех буферах
 (column-number-mode t) ;; показать номер столбца в mode-line
 (setq linum-format " %d") ;; задаем формат нумерации строк
+(add-hook 'pdf-view-mode-hook (lambda() (linum-mode -1)))
 
 
 (setq org-startup-truncated nil)
@@ -121,9 +151,8 @@
 (define-key global-map "\C-ca" 'org-agenda)
 (setq org-log-done t)
 
-
-(require 'org-ref)
-(setq reftex-default-bibliography '("~/Yandex.Disk/ОБРАЗОВАНИЕ/lib.bib"))
+;;(require 'org-ref)
+;;(setq reftex-default-bibliography '("~/Yandex.Disk/ОБРАЗОВАНИЕ/lib.bib"))
 
 (setq org-latex-pdf-process
       '("pdflatex -interaction nonstopmode -output-directory %o %f"
@@ -140,17 +169,6 @@
 (global-set-key (kbd "M-l") 'windmove-right)
 (global-set-key (kbd "M-i") 'windmove-up)
 (global-set-key (kbd "M-k") 'windmove-down)
-
-(global-unset-key (kbd "<f2>"))
-(global-set-key (kbd "<f2>") 'bs-show)
-
-(global-unset-key (kbd "<f11>"))
-(global-set-key (kbd "<f11>") (lambda() (interactive)(find-file "~/.emacs.d/init.el")))
-
-
-;; (defun my-mode-hook ()
-;;    (local-set-key (kbd "C-j") 'backward-char))
-;; (add-hook 'lisp-interaction-mode-hook 'my-mode-hook)
 
 (defun reverse-input-method (input-method)
   "Build the reverse mapping of single letters from INPUT-METHOD."
@@ -187,7 +205,7 @@
  '(custom-enabled-themes (quote (tango-dark)))
  '(package-selected-packages
    (quote
-    (sudo-edit yasnippet web-mode typo sr-speedbar phi-search-mc org-ref expand-region auto-complete))))
+    (org-pdftools yasnippet web-mode typo sudo-edit sr-speedbar phi-search-mc org-ref markdown-mode+ expand-region auto-complete))))
 
 (custom-set-faces
  '(default ((t (:family "Consolas" :foundry "unknown" :slant normal :weight normal :height 130 :width normal)))))

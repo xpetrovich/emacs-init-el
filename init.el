@@ -66,7 +66,7 @@
 (global-unset-key (kbd "<f11>"))
 (global-set-key (kbd "<f11>") (lambda() (interactive)(find-file "~/.emacs.d/init.el")))
 
-(pdf-tools-install)
+(pdf-loader-install)
 (require 'linum)
 
 (line-number-mode   t) ;; показать номер строки в mode-line
